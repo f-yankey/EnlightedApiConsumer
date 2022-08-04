@@ -26,11 +26,13 @@ namespace EnlightedApiConsumer
         {
             Console.WriteLine("Initializing Configurations...");
             IConfiguration _configuration = InitializeConfig();
-            enlighteddbContext _dbContext = new enlighteddbContext();
 
             string _baseUrl = _configuration["BaseUrl"];
             string floorsEndPoint = _configuration["FloorsEndPoint"];
             string fixtureEndPoint = _configuration["FixtureEndPoint"];
+            string connectionString = _configuration["connectionstring"];
+            enlighteddbContext _dbContext = new enlighteddbContext(connectionString);
+
 
             IRequestHandler requestHandler = new RequestHandler(_baseUrl);
 
