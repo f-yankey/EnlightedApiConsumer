@@ -30,6 +30,8 @@ namespace EnlightedApiConsumer
                 var res = await client.GetAsync(request);
                 Console.WriteLine(res.Content);
                 Console.WriteLine("");
+
+                //var res = await client.ExecuteAsync(request);
                 var response = await client.GetAsync<T>(request);
 
                 return (new KeyValuePair<bool, string>(true, $"Success!"), response);

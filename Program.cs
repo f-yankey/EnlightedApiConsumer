@@ -10,6 +10,7 @@ namespace EnlightedApiConsumer
     {
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Initializing Configurations...");
             IConfiguration configuration = InitializeConfig();
 
             string _baseUrl = configuration["BaseUrl"];
@@ -31,14 +32,16 @@ namespace EnlightedApiConsumer
             long currentTimeStamp = AuthorizationHandler.GetTimeStamp(date_string);
             string authorizationHash = AuthorizationHandler.GetAuthorizationHash(username, apiKey, currentTimeStamp);
 
-            Console.WriteLine($"The current timestamp is {currentTimeStamp}");
-            Console.WriteLine($"The SHA1 hash of {username}{apiKey}{currentTimeStamp} is: {authorizationHash}");
+            //Console.WriteLine($"The current timestamp is {currentTimeStamp}");
+            //Console.WriteLine($"The SHA1 hash of {username}{apiKey}{currentTimeStamp} is: {authorizationHash}");
 
-
+            Console.WriteLine("Making Primary Request...");
             var floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, currentTimeStamp, authorizationHash);
 
             if (floorFeedback.response.Key)
             {
+                Console.WriteLine("Primary Request Successfull...");
+                Console.WriteLine("Beginning with Fixture Requests...");
                 foreach (var item in floorFeedback.result.floors)
                 {
                     string currentFloorFixtureEndpoint = fixtureEndPoint.Replace("{floorId}", item.id.ToString());
