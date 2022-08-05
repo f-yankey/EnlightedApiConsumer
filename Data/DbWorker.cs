@@ -9,11 +9,13 @@ namespace EnlightedApiConsumer.Data
 {
     public static class DbWorker
     {
-        public static async Task PopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, long currentTimeStamp, string authorizationHash)
+        public static async Task<KeyValuePair<bool,string>> PopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, long currentTimeStamp, string authorizationHash)
         {
             Console.WriteLine("Making Floors Request...");
 
             var floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, currentTimeStamp, authorizationHash);
+            
+            Console.WriteLine($"{floorFeedback.response.Value}");
 
             if (floorFeedback.response.Key)
             {
@@ -75,10 +77,13 @@ namespace EnlightedApiConsumer.Data
                     }
 
                 }
+
+                return new KeyValuePair<bool, string>(true, $"Database Successfully Updated!");
             }
             else
             {
-                Console.WriteLine($"{floorFeedback.response.Value}");
+                /*A Recursion until the population is successful*/
+                return await PopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
             }
         }
 

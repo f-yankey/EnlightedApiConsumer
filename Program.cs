@@ -53,8 +53,11 @@ namespace EnlightedApiConsumer
             
             Console.WriteLine("Starting Database Population...");
 
-            await DbWorker.PopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
+            KeyValuePair<bool,string> databasePopulationResult = await DbWorker.PopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
 
+           
+
+           
         }
 
        

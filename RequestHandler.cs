@@ -31,15 +31,13 @@ namespace EnlightedApiConsumer
                 Console.WriteLine(res.Content);
                 Console.WriteLine("");
 
-                //var res = await client.ExecuteAsync(request);
                 var response = await client.GetAsync<T>(request);
 
                 return (new KeyValuePair<bool, string>(true, $"Success!"), response);
             }
             catch (Exception ex)
             {
-                var defaultVal = default(T);
-                return (new KeyValuePair<bool, string>(false, $"An Error Occured! {ex.InnerException.Message}"), result: defaultVal);
+                return (new KeyValuePair<bool, string>(false, $"An Error Occured! {ex.Message}"), result: default(T));
             }
         }
     }
