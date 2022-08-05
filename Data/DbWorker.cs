@@ -10,7 +10,7 @@ namespace EnlightedApiConsumer.Data
 {
     public static class DbWorker
     {
-        public static async Task<KeyValuePair<bool,string>> PopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, long currentTimeStamp, string authorizationHash)
+        public static async Task<KeyValuePair<bool,string>> MakeApiCallsAndPopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, long currentTimeStamp, string authorizationHash)
         {
             Console.WriteLine("Making Floors Request...");
 

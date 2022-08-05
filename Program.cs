@@ -54,7 +54,7 @@ namespace EnlightedApiConsumer
 
                     Console.WriteLine("Starting API calls and Database Population...");
 
-                    KeyValuePair<bool, string> databasePopulationResult = await DbWorker.PopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
+                    KeyValuePair<bool, string> databasePopulationResult = await DbWorker.MakeApiCallsAndPopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
 
                     Console.WriteLine($"{databasePopulationResult.Value}");
                 }
