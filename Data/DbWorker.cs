@@ -1,4 +1,5 @@
 ﻿using EnlightedApiConsumer.Data.Models;
+using EnlightedApiConsumer.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,7 @@ namespace EnlightedApiConsumer.Data
             if (floorFeedback.response.Key)
             {
                 Console.WriteLine("Primary Request Successfull...");
-                Console.WriteLine("Beginning with Fixture Requests...");
-
+                
                 foreach (var floor in floorFeedback.result.floors)
                 {
                     Floor floorInDb = GetFloorInDb(_dbContext, floor);
@@ -41,6 +41,8 @@ namespace EnlightedApiConsumer.Data
                     {
                         Console.WriteLine($"Floor with ID: {floorInDb.FloorId} already exists!");
                     }
+
+                    Console.WriteLine($"Fetching Fixtures for Floor with ID: {floorInDb.FloorId}...");
 
                     string currentFloorFixtureEndpoint = fixtureEndPoint.Replace("{floorId}", floor.id.ToString());
                     var fixtureFeedback = await requestHandler.GetRequestResponseAsync<FixtureResults>(currentFloorFixtureEndpoint, username, currentTimeStamp, authorizationHash);
@@ -72,8 +74,7 @@ namespace EnlightedApiConsumer.Data
                                 Console.WriteLine($"Fixture with ID: {fixtureInDb.FixtureId} and Name: {fixtureInDb.Name} already exists!");
                             }
                         }
-                        /*Saving all fixtures just added to context*/
-                        _dbContext.SaveChanges();
+                        
                     }
 
                 }
@@ -101,6 +102,8 @@ namespace EnlightedApiConsumer.Data
                 ClassName = fix.ClassName
             };
             _dbContext.Fixtures.Add(fixtureInDb);
+            _dbContext.SaveChanges();
+            Console.WriteLine($"Floor with ID: {floorInDb.FloorId} fixtures saved");
             return fixtureInDb;
         }
 

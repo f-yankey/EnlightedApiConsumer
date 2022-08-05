@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EnlightedApiConsumer
+namespace EnlightedApiConsumer.Utils
 {
     public class RequestHandler : IRequestHandler
     {
