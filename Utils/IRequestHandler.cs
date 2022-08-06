@@ -8,6 +8,6 @@ namespace EnlightedApiConsumer.Utils
 {
     public interface IRequestHandler
     {
-        Task<(KeyValuePair<bool, string> response, T? result)> GetRequestResponseAsync<T>(string endpoint, string username, long currentTimeStamp, string authorizationHash);
+        Task<(KeyValuePair<bool, string> response, T? result)> GetRequestResponseAsync<T>(string endpoint, string username, string current_date_string, string apiKey);
     }
 }

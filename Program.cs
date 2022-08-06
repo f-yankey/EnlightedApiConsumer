@@ -37,12 +37,9 @@ namespace EnlightedApiConsumer
             IRequestHandler requestHandler = new RequestHandler(_baseUrl);
             
             /*settings for authentication*/
-            string date_string = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff tt");
             string username = _configuration["Username"];
             string apiKey = _configuration["ApiKey"];
-            long currentTimeStamp = AuthorizationHandler.GetTimeStamp(date_string);
-            string authorizationHash = AuthorizationHandler.GetAuthorizationHash(username, apiKey, currentTimeStamp);
-
+           
             /*This block discards the database context after use*/
             using (enlighteddbContext _dbContext = new enlighteddbContext(connectionString))
             {
@@ -54,7 +51,7 @@ namespace EnlightedApiConsumer
 
                     Console.WriteLine("Starting API calls and Database Population...");
 
-                    KeyValuePair<bool, string> databasePopulationResult = await DbWorker.MakeApiCallsAndPopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
+                    KeyValuePair<bool, string> databasePopulationResult = await DbWorker.MakeApiCallsAndPopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, apiKey);
 
                     Console.WriteLine($"{databasePopulationResult.Value}");
                 }

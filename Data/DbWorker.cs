@@ -10,11 +10,16 @@ namespace EnlightedApiConsumer.Data
 {
     public static class DbWorker
     {
-        public static async Task<KeyValuePair<bool,string>> MakeApiCallsAndPopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, long currentTimeStamp, string authorizationHash)
+        public static string GetCurrentDateTimeString()
+        {
+            string date_string = DateTime.Now.ToString("MM/dd/yyyy hh:mm:ss.fff tt");
+            return date_string;
+        }
+        public static async Task<KeyValuePair<bool,string>> MakeApiCallsAndPopulateDatabase(enlighteddbContext _dbContext, string floorsEndPoint, string fixtureEndPoint, IRequestHandler requestHandler, string username, string apiKey)
         {
             Console.WriteLine("Making Floors Request...");
 
-            var floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, currentTimeStamp, authorizationHash);
+            var floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, GetCurrentDateTimeString(), apiKey);
             
             Console.WriteLine($"{floorFeedback.response.Value}");
 
@@ -45,7 +50,7 @@ namespace EnlightedApiConsumer.Data
                     Console.WriteLine($"Fetching Fixtures for Floor with ID: {floorInDb.FloorId}...");
 
                     string currentFloorFixtureEndpoint = fixtureEndPoint.Replace("{floorId}", floor.id.ToString());
-                    var fixtureFeedback = await requestHandler.GetRequestResponseAsync<FixtureResults>(currentFloorFixtureEndpoint, username, currentTimeStamp, authorizationHash);
+                    var fixtureFeedback = await requestHandler.GetRequestResponseAsync<FixtureResults>(currentFloorFixtureEndpoint, username, GetCurrentDateTimeString(), apiKey);
 
                     if (fixtureFeedback.response.Key)
                     {
@@ -84,7 +89,7 @@ namespace EnlightedApiConsumer.Data
             else
             {
                 /*A Recursion until the population is successful*/
-                return await PopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, currentTimeStamp, authorizationHash);
+                return await MakeApiCallsAndPopulateDatabase(_dbContext, floorsEndPoint, fixtureEndPoint, requestHandler, username, apiKey);
             }
         }
 
