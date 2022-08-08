@@ -25,7 +25,7 @@ namespace EnlightedApiConsumer.Utils
 
         public static long GetTimeStamp(string date_string)
         {
-            var date = DateTime.Parse(date_string);
+            DateTime date = DateTime.Parse(date_string);
             return new DateTimeOffset(date).ToUnixTimeMilliseconds();
         }
 

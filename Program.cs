@@ -15,11 +15,11 @@ namespace EnlightedApiConsumer
     {
         private static IConfiguration InitializeConfig()
         {
-            var builder = new ConfigurationBuilder()
+            IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
 
-            var configuration = builder.Build();
+            IConfigurationRoot configuration = builder.Build();
             return configuration;
         }
 

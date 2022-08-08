@@ -1,5 +1,6 @@
 ﻿using EnlightedApiConsumer.Data.Models;
 using EnlightedApiConsumer.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace EnlightedApiConsumer.Data
         {
             Console.WriteLine("Making Floors Request...");
 
-            var floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, GetCurrentDateTimeString(), apiKey);
+            (KeyValuePair<bool, string> response, FloorResults? result) floorFeedback = await requestHandler.GetRequestResponseAsync<FloorResults>(floorsEndPoint, username, GetCurrentDateTimeString(), apiKey);
             
             Console.WriteLine($"{floorFeedback.response.Value}");
 
@@ -27,11 +28,12 @@ namespace EnlightedApiConsumer.Data
             {
                 Console.WriteLine("Primary Request Successfull...");
                 
-                foreach (var floor in floorFeedback.result.floors)
+                foreach (Models.Floor floor in floorFeedback.result.floors)
                 {
                     Floor floorInDb = GetFloorInDb(_dbContext, floor);
                     if (floorInDb == null)
                     {
+                        /*Add floor if it does not exist in database*/
                         try
                         {
                             floorInDb = AddNewFloor(_dbContext, floor);
@@ -44,13 +46,23 @@ namespace EnlightedApiConsumer.Data
                     }
                     else
                     {
-                        Console.WriteLine($"Floor with ID: {floorInDb.FloorId} already exists!");
+                        Console.WriteLine($"\nFloor with ID: {floorInDb.FloorId} already exists! Updating...");
+                        /*Update floor if it already exists*/
+                        try
+                        {
+                            floorInDb = UpdateFloor(_dbContext, floor);
+                            Console.WriteLine($"Floor with ID: {floorInDb.FloorId} successfully updated!");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Failed!!! Update Failed for Floor with ID: {floorInDb.FloorId}. Error Message: {ex.Message} ");
+                        }
                     }
 
                     Console.WriteLine($"Fetching Fixtures for Floor with ID: {floorInDb.FloorId}...");
 
-                    string currentFloorFixtureEndpoint = fixtureEndPoint.Replace("{floorId}", floor.id.ToString());
-                    var fixtureFeedback = await requestHandler.GetRequestResponseAsync<FixtureResults>(currentFloorFixtureEndpoint, username, GetCurrentDateTimeString(), apiKey);
+                    string currentFloorFixtureEndpoint = fixtureEndPoint.Replace("{floorId}", floor.Id.ToString());
+                    (KeyValuePair<bool, string> response, FixtureResults? result) fixtureFeedback = await requestHandler.GetRequestResponseAsync<FixtureResults>(currentFloorFixtureEndpoint, username, GetCurrentDateTimeString(), apiKey);
 
                     if (fixtureFeedback.response.Key)
                     {
@@ -58,7 +70,7 @@ namespace EnlightedApiConsumer.Data
 
                         Console.WriteLine($"Adding Fixtures for Floor with ID: {floorInDb.FloorId}");
 
-                        foreach (var fix in fixtures)
+                        foreach (Models.Fixture fix in fixtures)
                         {
                             Fixture fixtureInDb = GetFixtureInDb(_dbContext, floorInDb, fix);
 
@@ -76,7 +88,17 @@ namespace EnlightedApiConsumer.Data
                             }
                             else
                             {
-                                Console.WriteLine($"Fixture with ID: {fixtureInDb.FixtureId} and Name: {fixtureInDb.Name} already exists!");
+                                try
+                                {
+                                    Console.WriteLine($"Fixture with ID: {fixtureInDb.FixtureId} and Name: {fixtureInDb.Name} already exists! Updating...");
+                                    UpdateFixture(_dbContext, floorInDb, fix);
+                                    Console.WriteLine($"Fixture with ID: {fixtureInDb.FixtureId} successfully updated!");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"Failed!!! Update Failed for Fixture with ID: {fix.Id}. Error Message: {ex.Message} ");
+                                }
+
                             }
                         }
                         
@@ -93,17 +115,19 @@ namespace EnlightedApiConsumer.Data
             }
         }
 
-        private static Fixture AddNewFixture(enlighteddbContext _dbContext, Floor floorInDb, Data.Models.Fixture fix)
+        
+
+        private static Fixture AddNewFixture(enlighteddbContext _dbContext, Floor floorInDb, Models.Fixture fix)
         {
             Fixture fixtureInDb = new Fixture
             {
-                FixtureId = fix.id,
+                FixtureId = fix.Id,
                 FloorId = floorInDb.FloorId,
-                Name = fix.name,
-                Xaxis = fix.xaxis,
-                Yaxis = fix.yaxis,
-                GroupId = fix.groupId,
-                MacAddress = fix.macAddress,
+                Name = fix.Name,
+                Xaxis = fix.Xaxis,
+                Yaxis = fix.Yaxis,
+                GroupId = fix.GroupId,
+                MacAddress = fix.MacAddress,
                 ClassName = fix.ClassName
             };
             _dbContext.Fixtures.Add(fixtureInDb);
@@ -112,22 +136,39 @@ namespace EnlightedApiConsumer.Data
             return fixtureInDb;
         }
 
+        private static Fixture UpdateFixture(enlighteddbContext dbContext, Floor floorInDb, Models.Fixture fixture)
+        {
+            Fixture record = GetFixtureInDb(dbContext, floorInDb, fixture);
+
+            record.Name = fixture.Name;
+            record.Xaxis = fixture.Xaxis;
+            record.Yaxis = fixture.Yaxis;
+            record.GroupId = fixture.GroupId;
+            record.MacAddress = fixture.MacAddress;
+            record.ClassName = fixture.ClassName;
+            
+            dbContext.Entry(record).State = EntityState.Modified;
+            dbContext.SaveChanges();
+
+            return record;
+        }
+
         private static Fixture GetFixtureInDb(enlighteddbContext _dbContext, Floor floorInDb, Data.Models.Fixture fix)
         {
-            return _dbContext.Fixtures.Where(x => x.FixtureId == fix.id && x.FloorId == floorInDb.FloorId).FirstOrDefault();
+            return _dbContext.Fixtures.Where(x => x.FixtureId == fix.Id && x.FloorId == floorInDb.FloorId).FirstOrDefault();
         }
 
         private static Floor AddNewFloor(enlighteddbContext _dbContext, Data.Models.Floor floor)
         {
             Floor floorInDb = new Floor
             {
-                FloorId = floor.id,
-                Name = floor.name,
-                Building = floor.building,
-                Campus = floor.campus,
-                Company = floor.company,
-                Description = floor.description,
-                FloorPlanUrl = floor.floorPlanUrl,
+                FloorId = floor.Id,
+                Name = floor.Name,
+                Building = floor.Building,
+                Campus = floor.Campus,
+                Company = floor.Company,
+                Description = floor.Description,
+                FloorPlanUrl = floor.FloorPlanUrl,
                 ParentFloorId = floor.ParentFloorId
             };
             _dbContext.Floors.Add(floorInDb);
@@ -135,9 +176,27 @@ namespace EnlightedApiConsumer.Data
             return floorInDb;
         }
 
+        private static Floor UpdateFloor(enlighteddbContext dbContext, Models.Floor floor)
+        {
+            Floor record = GetFloorInDb(dbContext, floor);
+
+            record.Name = floor.Name;
+            record.Building = floor.Building;
+            record.Campus = floor.Campus;
+            record.Company = floor.Company;
+            record.Description = floor.Description;
+            record.FloorPlanUrl = floor.FloorPlanUrl;
+            record.ParentFloorId = floor.ParentFloorId;
+
+            dbContext.Entry(record).State = EntityState.Modified;
+            dbContext.SaveChanges();
+
+            return record;
+        }
+
         private static Floor GetFloorInDb(enlighteddbContext _dbContext, Data.Models.Floor floor)
         {
-            return _dbContext.Floors.Where(x => x.FloorId == floor.id).FirstOrDefault();
+            return _dbContext.Floors.Where(x => x.FloorId == floor.Id).FirstOrDefault();
         }
 
     }

@@ -9,12 +9,10 @@ namespace EnlightedApiConsumer.Utils
 {
     public class RequestHandler : IRequestHandler
     {
-        //private string _baseUrl;
         private RestClient _client;
 
         public RequestHandler(string baseUrl)
         {
-            //_baseUrl = baseUrl;
             _client = new RestClient(baseUrl);
         }
 
@@ -26,16 +24,16 @@ namespace EnlightedApiConsumer.Utils
                 long currentTimeStamp = AuthorizationHandler.GetTimeStamp(current_date_string);
                 string authorizationHash = AuthorizationHandler.GetAuthorizationHash(username, apiKey, currentTimeStamp);
 
-                var request = new RestRequest(endpoint);
+                RestRequest request = new RestRequest(endpoint);
                 request.AddHeader("ApiKey", username);
                 request.AddHeader("ts", currentTimeStamp);
                 request.AddHeader("Authorization", authorizationHash);
 
-                var res = await _client.GetAsync(request);
-                Console.WriteLine(res.Content);
-                Console.WriteLine("");
-
-                var response = await _client.GetAsync<T>(request);
+                /*For debugging purposes*/
+                //var res = await _client.GetAsync(request);
+                //Console.WriteLine(res.Content);
+                
+                T response = await _client.GetAsync<T>(request);
 
                 return (new KeyValuePair<bool, string>(true, $"Success!"), response);
             }

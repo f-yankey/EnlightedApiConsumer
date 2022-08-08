@@ -16,33 +16,26 @@ namespace EnlightedApiConsumer.Data.Models
     public class Floor
     {
 
-        //[XmlAttribute("id")]  [XmlElement("RefNo")]    
-        //[XmlElement("id")]
-        public int id { get; set; }
+        [XmlElement(ElementName = "id")]
+        public int Id { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("name")]
-        public int name { get; set; }
+        [XmlElement(ElementName = "name")]
+        public int Name { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("building")]
-        public int building { get; set; }
+        [XmlElement(ElementName = "building")]
+        public int Building { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("campus")]
-        public int campus { get; set; }
+        [XmlElement(ElementName = "campus")]
+        public int Campus { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("company")]
-        public int company { get; set; }
+        [XmlElement(ElementName = "company")]
+        public int Company { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("description")]
-        public string? description { get; set; }
+        [XmlElement(ElementName = "description")]
+        public string? Description { get; set; }
 
-        //[XmlAttribute]
-        //[XmlElement("floorPlanUrl")]
-        public string floorPlanUrl { get; set; }
+        [XmlElement(ElementName = "floorPlanUrl")]
+        public string FloorPlanUrl { get; set; }
 
         [XmlElement(ElementName = "parentFloorId")]
         public string ParentFloorId { get; set; }

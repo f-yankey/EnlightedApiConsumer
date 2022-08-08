@@ -16,12 +16,18 @@ namespace EnlightedApiConsumer.Data.Models
 
     public class Fixture
     {
-        public int id { get; set; }
-        public string name { get; set; }
-        public int xaxis { get; set; }
-        public int yaxis { get; set; }
-        public int groupId { get; set; }
-        public string macAddress { get; set; }
+        [XmlElement(ElementName = "id")]
+        public int Id { get; set; }
+        [XmlElement(ElementName = "name")]
+        public string Name { get; set; }
+        [XmlElement(ElementName = "xaxis")]
+        public int Xaxis { get; set; }
+        [XmlElement(ElementName = "yaxis")]
+        public int Yaxis { get; set; }
+        [XmlElement(ElementName = "groupId")]
+        public int GroupId { get; set; }
+        [XmlElement(ElementName = "macAddress")]
+        public string MacAddress { get; set; }
 
         [XmlElement(ElementName = "class")]
         public string ClassName { get; set; }
